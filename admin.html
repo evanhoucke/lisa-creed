@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Liste cadeaux Lisa Vanhoucke</title>
+    <meta
+      name="description"
+      content="Espace admin pour consulter les participations de la liste cadeaux."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="announcement-bar">
+      Administration privée | Liste cadeaux Lisa Vanhoucke
+    </div>
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="badge">Espace privé</p>
+        <h1>Studio admin</h1>
+        <p>Connecte-toi pour gérer les cadeaux et suivre les participations.</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <p id="admin-status" class="status" role="status" aria-live="polite"></p>
+
+      <section id="auth-section" class="card auth-card">
+        <h2>Connexion</h2>
+        <form id="login-form" class="auth-form" method="post" action="">
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            Mot de passe
+            <input type="password" name="password" required />
+          </label>
+          <button type="submit">Se connecter</button>
+        </form>
+      </section>
+
+      <section id="dashboard-section" class="admin-dashboard hidden">
+        <div class="admin-head">
+          <h2>Tableau de bord</h2>
+          <button id="logout-btn" type="button" class="secondary">
+            Se déconnecter
+          </button>
+        </div>
+
+        <div class="card gift-admin-card">
+          <h3 id="gift-form-title">Ajouter un cadeau</h3>
+          <form id="gift-form" class="gift-form" method="post" action="">
+            <input type="hidden" name="gift_id" />
+            <label>
+              Nom du cadeau
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              Description
+              <textarea name="description" rows="3" required></textarea>
+            </label>
+            <label>
+              Prix approximatif (€)
+              <input type="number" name="price" min="0" step="0.01" required />
+            </label>
+            <label>
+              Photos du cadeau
+              <input
+                type="file"
+                name="photos"
+                accept="image/png,image/jpeg,image/webp"
+                multiple
+              />
+            </label>
+            <p id="gift-photo-help" class="small-note">
+              Au moins une photo requise pour un nouveau cadeau.
+            </p>
+            <div id="existing-photos-wrap" class="hidden">
+              <p class="small-note">Photos existantes</p>
+              <div id="existing-photos" class="existing-photos"></div>
+            </div>
+            <div class="inline-actions">
+              <button id="gift-submit-btn" type="submit">Ajouter le cadeau</button>
+              <button
+                id="gift-cancel-edit-btn"
+                type="button"
+                class="secondary hidden"
+              >
+                Annuler la modification
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card table-card">
+          <h3>Liste des cadeaux</h3>
+          <div id="admin-gift-list" class="admin-gift-grid"></div>
+        </div>
+
+        <div id="summary" class="summary-grid"></div>
+
+        <div class="card table-card">
+          <h3>Participations</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Cadeau</th>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Montant</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody id="participations-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p><a href="index.html">Retour au site public</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

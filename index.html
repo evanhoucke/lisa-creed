@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liste cadeaux - Lisa Vanhoucke</title>
+    <meta
+      name="description"
+      content="Liste de cadeaux de profession de foi de Lisa Vanhoucke."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="announcement-bar">
+      Livraison d'amour garantie | Profession de foi de Lisa Vanhoucke
+    </div>
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="badge">Profession de foi</p>
+        <h1>La sélection cadeaux de Lisa</h1>
+        <p>
+          Merci d'être là pour partager ce moment avec moi. Choisis un cadeau et
+          participe simplement en quelques clics.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card intro">
+        <h2>Comment participer</h2>
+        <ol>
+          <li>Choisis un cadeau dans la liste.</li>
+          <li>Clique sur <strong>Je participe</strong>.</li>
+          <li>Envoie le formulaire, je recevrai directement ta proposition.</li>
+        </ol>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+
+      <section>
+        <h2 class="section-title">Cadeaux souhaités</h2>
+        <div id="gift-list" class="gift-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <dialog id="participation-modal" class="modal">
+      <form id="participation-form" class="modal-form" method="dialog">
+        <h3>Participer à un cadeau</h3>
+        <p id="selected-gift" class="selected-gift"></p>
+
+        <label>
+          Ton prénom et nom
+          <input type="text" name="name" required />
+        </label>
+
+        <label>
+          Ton email
+          <input type="email" name="email" required />
+        </label>
+
+        <label>
+          Montant que tu proposes (€)
+          <input type="number" name="amount" min="1" required />
+        </label>
+
+        <label>
+          Message (optionnel)
+          <textarea name="message" rows="3"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" id="cancel-btn" class="secondary">Annuler</button>
+          <button type="submit">Envoyer ma participation</button>
+        </div>
+
+        <p class="small-note">Les participations sont enregistrées dans Supabase.</p>
+      </form>
+    </dialog>
+
+    <footer>
+      <p>Avec amour, Lisa Vanhoucke.</p>
+      <p><a href="admin.html">Espace admin</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

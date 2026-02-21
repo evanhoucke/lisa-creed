@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env
+.env
+.env.*
+
+# Dependencies (if added later)
+node_modules/
+
+# Python cache (local tools)
+__pycache__/
+*.pyc
