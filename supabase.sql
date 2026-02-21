@@ -38,6 +38,8 @@ create table if not exists public.gift_photos (
 create or replace function public.check_remaining_before_participation()
 returns trigger
 language plpgsql
+security definer
+set search_path = public
 as $$
 declare
   v_price numeric(10, 2);
@@ -68,6 +70,8 @@ $$;
 create or replace function public.sync_gift_amount_collected()
 returns trigger
 language plpgsql
+security definer
+set search_path = public
 as $$
 begin
   if tg_op = 'UPDATE' and old.gift_id is distinct from new.gift_id then
@@ -254,8 +258,8 @@ and not exists (
 
 insert into public.gifts (title, price, description, note, sort_order)
 values
-  ('Bijou souvenir', 120, 'Un bijou discret pour garder un souvenir de cette journée.', 'Un bijou discret pour garder un souvenir de cette journée.', 1),
-  ('Collection de livres', 75, 'Des livres inspirants que je pourrai lire au fil de l''année.', 'Des livres inspirants que je pourrai lire au fil de l''année.', 2),
+  ('Flip7', 15, 'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.', 'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.', 1),
+  ('Sac en cuir Paul Marius', 135, 'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses.', 'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses.', 2),
   ('Participation vélo', 350, 'Un vélo pour mes trajets et balades.', 'Un vélo pour mes trajets et balades.', 3),
   ('Atelier créatif', 90, 'Une expérience artistique à partager.', 'Une expérience artistique à partager.', 4),
   ('Week-end en famille', 420, 'Une participation pour un beau moment tous ensemble.', 'Une participation pour un beau moment tous ensemble.', 5)

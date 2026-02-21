@@ -288,7 +288,8 @@ form.addEventListener("submit", async (event) => {
   });
 
   if (error) {
-    alert("Erreur lors de l'enregistrement. Merci de réessayer.");
+    const reason = error?.message ? ` (${error.message})` : "";
+    alert(`Erreur lors de l'enregistrement${reason}. Merci de réessayer.`);
     return;
   }
 
