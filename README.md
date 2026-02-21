@@ -55,6 +55,10 @@ La page admin permet de:
 - modifier un cadeau existant (texte, prix, photo)
 - supprimer un cadeau existant
 
+Sur le site public:
+- le montant restant est affiché pour chaque cadeau
+- une participation ne peut pas dépasser le montant restant
+
 Important:
 - Le script `supabase.sql` crée le bucket `gift-photos` et les règles d'accès.
 - Si tu avais déjà exécuté un ancien script, relance la version actuelle de `supabase.sql`.

@@ -10,6 +10,7 @@ const modal = document.getElementById("participation-modal");
 const form = document.getElementById("participation-form");
 const selectedGiftText = document.getElementById("selected-gift");
 const cancelBtn = document.getElementById("cancel-btn");
+const amountInput = form.elements.amount;
 
 let selectedGift = null;
 let gifts = [];
@@ -51,8 +52,24 @@ function getSortedPhotoUrls(gift) {
   return urls;
 }
 
+function toAmount(value) {
+  return Number(value || 0);
+}
+
+function formatEuro(value) {
+  return toAmount(value).toFixed(2).replace(".", ",");
+}
+
+function getRemainingAmount(gift) {
+  const target = toAmount(gift.price);
+  const collected = toAmount(gift.amount_collected);
+  return Math.max(0, target - collected);
+}
+
 function renderGift(gift) {
   const safeDescription = gift.description || gift.note || "";
+  const remaining = getRemainingAmount(gift);
+  const isComplete = remaining <= 0;
   const photoUrls = getSortedPhotoUrls(gift);
   const carouselId = `carousel-${gift.id}`;
   const photoBlock = photoUrls.length
@@ -80,8 +97,19 @@ function renderGift(gift) {
       ${photoBlock}
       <h3>${escapeHtml(gift.title)}</h3>
       <p class="price">Budget indicatif: ${gift.price} €</p>
+      <p class="small-note">
+        ${
+          isComplete
+            ? "Cadeau complété"
+            : `Montant restant: ${formatEuro(remaining)} EUR`
+        }
+      </p>
       <p>${escapeHtml(safeDescription)}</p>
-      <button type="button" data-gift-id="${gift.id}">Je participe</button>
+      <button type="button" data-gift-id="${gift.id}" ${
+        isComplete ? "disabled" : ""
+      }>
+        ${isComplete ? "Complet" : "Je participe"}
+      </button>
     </article>
   `;
 }
@@ -147,7 +175,7 @@ async function loadGifts() {
   const withPhotos = await supabaseClient
     .from("gifts")
     .select(
-      "id, title, price, description, note, photo_url, gift_photos(photo_url, sort_order)"
+      "id, title, price, amount_collected, description, note, photo_url, gift_photos(photo_url, sort_order)"
     )
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
@@ -158,7 +186,7 @@ async function loadGifts() {
   } else {
     const basic = await supabaseClient
       .from("gifts")
-      .select("id, title, price, description, note, photo_url")
+      .select("id, title, price, amount_collected, description, note, photo_url")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
@@ -210,6 +238,14 @@ giftList.addEventListener("click", (event) => {
     return;
   }
 
+  const remaining = getRemainingAmount(selectedGift);
+  if (remaining <= 0) {
+    return;
+  }
+
+  amountInput.max = String(remaining);
+  amountInput.step = "0.01";
+  amountInput.placeholder = `Maximum ${formatEuro(remaining)} EUR`;
   selectedGiftText.textContent = `Cadeau sélectionné: ${selectedGift.title}`;
   modal.showModal();
 });
@@ -231,6 +267,17 @@ form.addEventListener("submit", async (event) => {
   const contributorEmail = String(formData.get("email") || "");
   const amount = Number(formData.get("amount"));
   const message = String(formData.get("message") || "");
+  const remaining = getRemainingAmount(selectedGift);
+
+  if (Number.isNaN(amount) || amount <= 0) {
+    alert("Merci d'indiquer un montant valide.");
+    return;
+  }
+
+  if (amount > remaining) {
+    alert(`Le montant maximum pour ce cadeau est ${formatEuro(remaining)} EUR.`);
+    return;
+  }
 
   const { error } = await supabaseClient.from("participations").insert({
     gift_id: selectedGift.id,
@@ -261,6 +308,7 @@ form.addEventListener("submit", async (event) => {
   }
   form.reset();
   modal.close();
+  await loadGifts();
 });
 
 async function init() {

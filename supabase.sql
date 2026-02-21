@@ -4,6 +4,7 @@ create table if not exists public.gifts (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   price numeric(10, 2) not null check (price >= 0),
+  amount_collected numeric(10, 2) not null default 0 check (amount_collected >= 0),
   description text,
   photo_url text,
   note text,
@@ -14,6 +15,7 @@ create table if not exists public.gifts (
 
 alter table public.gifts add column if not exists description text;
 alter table public.gifts add column if not exists photo_url text;
+alter table public.gifts add column if not exists amount_collected numeric(10, 2) not null default 0;
 
 create table if not exists public.participations (
   id uuid primary key default gen_random_uuid(),
@@ -32,6 +34,87 @@ create table if not exists public.gift_photos (
   sort_order integer not null default 1,
   created_at timestamptz not null default now()
 );
+
+create or replace function public.check_remaining_before_participation()
+returns trigger
+language plpgsql
+as $$
+declare
+  v_price numeric(10, 2);
+  v_collected numeric(10, 2);
+begin
+  select price, amount_collected
+    into v_price, v_collected
+  from public.gifts
+  where id = new.gift_id
+  for update;
+
+  if v_price is null then
+    raise exception 'Gift not found';
+  end if;
+
+  if new.amount <= 0 then
+    raise exception 'Amount must be greater than zero';
+  end if;
+
+  if coalesce(v_collected, 0) + new.amount > v_price then
+    raise exception 'Amount exceeds remaining gift budget';
+  end if;
+
+  return new;
+end;
+$$;
+
+create or replace function public.sync_gift_amount_collected()
+returns trigger
+language plpgsql
+as $$
+begin
+  if tg_op = 'UPDATE' and old.gift_id is distinct from new.gift_id then
+    update public.gifts
+    set amount_collected = coalesce((
+      select sum(amount)
+      from public.participations
+      where gift_id = old.gift_id
+    ), 0)
+    where id = old.gift_id;
+  end if;
+
+  update public.gifts
+  set amount_collected = coalesce((
+    select sum(amount)
+    from public.participations
+    where gift_id = coalesce(new.gift_id, old.gift_id)
+  ), 0)
+  where id = coalesce(new.gift_id, old.gift_id);
+
+  return coalesce(new, old);
+end;
+$$;
+
+drop trigger if exists trg_check_remaining_before_participation on public.participations;
+create trigger trg_check_remaining_before_participation
+before insert on public.participations
+for each row
+execute function public.check_remaining_before_participation();
+
+drop trigger if exists trg_sync_gift_amount_collected_after_insert on public.participations;
+create trigger trg_sync_gift_amount_collected_after_insert
+after insert on public.participations
+for each row
+execute function public.sync_gift_amount_collected();
+
+drop trigger if exists trg_sync_gift_amount_collected_after_update on public.participations;
+create trigger trg_sync_gift_amount_collected_after_update
+after update on public.participations
+for each row
+execute function public.sync_gift_amount_collected();
+
+drop trigger if exists trg_sync_gift_amount_collected_after_delete on public.participations;
+create trigger trg_sync_gift_amount_collected_after_delete
+after delete on public.participations
+for each row
+execute function public.sync_gift_amount_collected();
 
 alter table public.gifts enable row level security;
 alter table public.participations enable row level security;
@@ -151,6 +234,13 @@ create policy "Authenticated can upload gift photos"
 update public.gifts
 set description = coalesce(description, note)
 where description is null;
+
+update public.gifts
+set amount_collected = coalesce((
+  select sum(amount)
+  from public.participations
+  where participations.gift_id = gifts.id
+), 0);
 
 insert into public.gift_photos (gift_id, photo_url, sort_order)
 select gifts.id, gifts.photo_url, 1
