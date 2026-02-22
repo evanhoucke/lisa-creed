@@ -27,6 +27,34 @@ body {
     radial-gradient(circle at 8% -10%, #ffd2ba 0, transparent 35%),
     radial-gradient(circle at 95% 12%, #ffd4dd 0, transparent 28%),
     var(--vanilla);
+  position: relative;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  opacity: 0.2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='22' y='52' font-size='22' fill='%23d26d63' fill-opacity='0.55'%3E%E2%9D%A4%3C/text%3E%3Ctext x='120' y='72' font-size='20' fill='%23e2ad5f' fill-opacity='0.58'%3E%E2%9C%BF%3C/text%3E%3Ctext x='68' y='140' font-size='18' fill='%23bf4a64' fill-opacity='0.45'%3E%E2%9D%80%3C/text%3E%3Ctext x='156' y='170' font-size='17' fill='%23d26d63' fill-opacity='0.4'%3E%E2%9D%A4%3C/text%3E%3Ctext x='30' y='198' font-size='16' fill='%23e2ad5f' fill-opacity='0.45'%3E%E2%9C%BF%3C/text%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  background-repeat: repeat;
+}
+
+body::after {
+  opacity: 0.14;
+  background-image:
+    linear-gradient(45deg, rgba(210, 109, 99, 0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(210, 109, 99, 0.12) 25%, transparent 25%);
+  background-size: 28px 28px;
+  background-position:
+    0 0,
+    14px 14px;
 }
 
 .announcement-bar {
@@ -52,6 +80,43 @@ body {
   box-shadow: var(--shadow-soft);
   text-align: center;
   padding: 2.1rem 1.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-inner::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  width: 160px;
+  height: 160px;
+  opacity: 0.7;
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Birds-PNG/White_Dove_Transparent_PNG_Clipart.png?m=1629829990");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.hero-inner::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 140px;
+  height: 140px;
+  opacity: 0.32;
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Birds-PNG/White_Dove_Transparent_PNG_Clipart.png?m=1629829990");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: scaleX(-1);
+}
+
+.hero-inner h1::after {
+  content: "  ❤  ✿";
+  color: rgba(210, 109, 99, 0.75);
+  font-size: 0.55em;
+  letter-spacing: 0.2em;
+  vertical-align: middle;
 }
 
 .badge {
@@ -98,6 +163,18 @@ h1 {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "❤ ✿ ❀";
+  position: absolute;
+  top: 0.45rem;
+  right: 0.7rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.2rem;
+  color: rgba(210, 109, 99, 0.35);
 }
 
 .intro {
@@ -147,6 +224,52 @@ h1 {
   padding: 1rem;
   border: 1px solid var(--line);
   box-shadow: 0 10px 22px rgba(210, 109, 99, 0.14);
+  position: relative;
+}
+
+.gift::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd27e, #ef7a62);
+  opacity: 0.7;
+}
+
+.gift::after {
+  content: "";
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.65rem;
+  width: 24px;
+  height: 24px;
+  opacity: 0.58;
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Birds-PNG/White_Dove_Transparent_PNG_Clipart.png?m=1629829990");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.gift h3::after {
+  content: "  ❤";
+  color: rgba(191, 74, 100, 0.75);
+  font-size: 0.65em;
+}
+
+.section-title::after {
+  content: "  ✿  ❀";
+  color: rgba(226, 173, 95, 0.9);
+  font-size: 0.7em;
+  letter-spacing: 0.1em;
+}
+
+footer p:first-child::before,
+footer p:first-child::after {
+  content: "✿";
+  color: rgba(210, 109, 99, 0.75);
+  margin: 0 0.45rem;
 }
 
 .gift-photo-strip {

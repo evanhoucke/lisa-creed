@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" fill="none">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.2" />
+    </filter>
+  </defs>
+
+  <path
+    d="M244 104c-18 11-40 15-58 13 6 15 5 32-4 47-13 21-37 34-62 34-35 0-64-28-64-64 0-36 29-64 65-64 10 0 20 2 28 6-6-16-6-34 2-50 10-20 28-33 50-38-9 16-10 37-2 56 10 21 31 35 58 41-7 16-22 37-45 52 13 2 24 1 32-3z"
+    fill="#ffffff"
+    fill-opacity="0.96"
+  />
+
+  <path
+    d="M126 66c-12-12-17-29-13-47M129 123c13-11 32-15 48-12M103 101c-9 1-18 6-24 14M72 162c14 23 44 35 70 28"
+    stroke="#f2f2f2"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <path
+    d="M244 104c-18 11-40 15-58 13 6 15 5 32-4 47-13 21-37 34-62 34-35 0-64-28-64-64 0-36 29-64 65-64 10 0 20 2 28 6-6-16-6-34 2-50 10-20 28-33 50-38-9 16-10 37-2 56 10 21 31 35 58 41-7 16-22 37-45 52 13 2 24 1 32-3z"
+    stroke="#e9e9e9"
+    stroke-width="3"
+    stroke-linejoin="round"
+  />
+
+  <circle cx="202" cy="95" r="5.5" fill="#e8e8e8" />
+  <ellipse cx="212" cy="96" rx="26" ry="13" fill="#ffffff" fill-opacity="0.2" filter="url(#soft)" />
+</svg>
