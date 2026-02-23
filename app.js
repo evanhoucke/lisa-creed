@@ -68,8 +68,10 @@ function getRemainingAmount(gift) {
 
 function renderGift(gift) {
   const safeDescription = gift.description || gift.note || "";
+  const budget = toAmount(gift.price);
   const remaining = getRemainingAmount(gift);
   const isComplete = remaining <= 0;
+  const showRemaining = remaining < budget && !isComplete;
   const photoUrls = getSortedPhotoUrls(gift);
   const carouselId = `carousel-${gift.id}`;
   const photoBlock = photoUrls.length
@@ -97,13 +99,13 @@ function renderGift(gift) {
       ${photoBlock}
       <h3>${escapeHtml(gift.title)}</h3>
       <p class="price">Budget indicatif: ${gift.price} €</p>
-      <p class="small-note">
-        ${
-          isComplete
-            ? "Cadeau complété"
-            : `Montant restant: ${formatEuro(remaining)} EUR`
-        }
-      </p>
+      ${
+        isComplete
+          ? '<p class="small-note">Cadeau complété</p>'
+          : showRemaining
+            ? `<p class="small-note">Montant restant: ${formatEuro(remaining)} EUR</p>`
+            : ""
+      }
       <p>${escapeHtml(safeDescription)}</p>
       <button type="button" data-gift-id="${gift.id}" ${
         isComplete ? "disabled" : ""

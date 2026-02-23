@@ -288,7 +288,9 @@ footer p:first-child::after {
   width: 100%;
   min-width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff7f1;
+  padding: 0.2rem;
   border-radius: 12px;
   scroll-snap-align: start;
   margin-bottom: 0;
@@ -481,7 +483,9 @@ footer a {
 .admin-gift-item img {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff7f1;
+  padding: 0.2rem;
   border-radius: 10px;
   margin-bottom: 0.45rem;
 }
