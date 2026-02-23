@@ -409,6 +409,26 @@ button.danger {
   display: block;
 }
 
+.image-modal {
+  max-width: 900px;
+  width: min(92vw, 900px);
+}
+
+.image-modal-content {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: center;
+}
+
+.image-modal-preview {
+  width: 100%;
+  max-height: 76vh;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff7f1;
+  padding: 0.35rem;
+}
+
 .modal-form {
   display: grid;
   gap: 0.8rem;

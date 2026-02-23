@@ -13,6 +13,9 @@ const cancelBtn = document.getElementById("cancel-btn");
 const amountInput = form.elements.amount;
 const thanksModal = document.getElementById("thanks-modal");
 const thanksCloseBtn = document.getElementById("thanks-close-btn");
+const imageModal = document.getElementById("image-modal");
+const imageModalPreview = document.getElementById("image-modal-preview");
+const imageModalCloseBtn = document.getElementById("image-modal-close-btn");
 
 let selectedGift = null;
 let gifts = [];
@@ -66,6 +69,21 @@ function getRemainingAmount(gift) {
   const target = toAmount(gift.price);
   const collected = toAmount(gift.amount_collected);
   return Math.max(0, target - collected);
+}
+
+function isGiftComplete(gift) {
+  return getRemainingAmount(gift) <= 0;
+}
+
+function sortGiftsForDisplay(items) {
+  return [...items].sort((a, b) => {
+    const aComplete = isGiftComplete(a);
+    const bComplete = isGiftComplete(b);
+    if (aComplete !== bComplete) {
+      return aComplete ? 1 : -1;
+    }
+    return 0;
+  });
 }
 
 function renderGift(gift) {
@@ -206,6 +224,7 @@ async function loadGifts() {
   }
 
   gifts = data || [];
+  gifts = sortGiftsForDisplay(gifts);
   giftList.innerHTML = gifts.map(renderGift).join("");
 
   if (gifts.length === 0) {
@@ -216,6 +235,14 @@ async function loadGifts() {
 }
 
 giftList.addEventListener("click", (event) => {
+  const clickedImage = event.target.closest("img.gift-photo");
+  if (clickedImage) {
+    imageModalPreview.src = clickedImage.src;
+    imageModalPreview.alt = clickedImage.alt || "Image agrandie";
+    imageModal.showModal();
+    return;
+  }
+
   const prevBtn = event.target.closest("button[data-carousel-prev]");
   if (prevBtn) {
     const track = document.getElementById(prevBtn.dataset.carouselPrev);
@@ -263,6 +290,10 @@ cancelBtn.addEventListener("click", () => {
 
 thanksCloseBtn.addEventListener("click", () => {
   thanksModal.close();
+});
+
+imageModalCloseBtn.addEventListener("click", () => {
+  imageModal.close();
 });
 
 form.addEventListener("submit", async (event) => {
