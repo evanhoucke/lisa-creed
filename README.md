@@ -28,6 +28,7 @@ Option B: via table editor de Supabase.
 
 Champs utiles dans `gifts`:
 - `title`
+- `seen_at` (affiché sous le titre: "Vu chez ...")
 - `price`
 - `description`
 - `photo_url`

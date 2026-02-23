@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.gifts (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  seen_at text,
   price numeric(10, 2) not null check (price >= 0),
   amount_collected numeric(10, 2) not null default 0 check (amount_collected >= 0),
   description text,
@@ -15,6 +16,7 @@ create table if not exists public.gifts (
 
 alter table public.gifts add column if not exists description text;
 alter table public.gifts add column if not exists photo_url text;
+alter table public.gifts add column if not exists seen_at text;
 alter table public.gifts add column if not exists amount_collected numeric(10, 2) not null default 0;
 
 create table if not exists public.participations (
@@ -240,16 +242,21 @@ set description = coalesce(description, note)
 where description is null;
 
 update public.gifts
+set title = 'Flip 7'
+where title = 'Flip7';
+
+update public.gifts
 set amount_collected = coalesce((
   select sum(amount)
   from public.participations
   where participations.gift_id = gifts.id
 ), 0);
 
-with seeded_gifts (title, price, description, note, sort_order, is_active) as (
+with seeded_gifts (title, seen_at, price, description, note, sort_order, is_active) as (
   values
     (
-      'Flip7',
+      'Flip 7',
+      'JoueClub',
       15,
       'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.',
       'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.',
@@ -258,19 +265,63 @@ with seeded_gifts (title, price, description, note, sort_order, is_active) as (
     ),
     (
       'Sac en cuir Paul Marius',
+      'Edisac',
       135,
-      'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transforme en sac business, porte-document idéal pour formats A4 et ordinateur 15 pouces, avec deux poches à boutons pression.',
-      'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transforme en sac business, porte-document idéal pour formats A4 et ordinateur 15 pouces, avec deux poches à boutons pression.',
+      'Le sac bandoulière vintage cuir, modèle LeDandy S de Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses. Coloris : cuivré. Référence : LEDANDYS.',
+      'Le sac bandoulière vintage cuir, modèle LeDandy S de Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses. Coloris : cuivré. Référence : LEDANDYS.',
       2,
       true
     ),
-    ('Participation vélo', 350, 'Un vélo pour mes trajets et balades.', 'Un vélo pour mes trajets et balades.', 3, true),
-    ('Atelier créatif', 90, 'Une expérience artistique à partager.', 'Une expérience artistique à partager.', 4, true),
-    ('Week-end en famille', 420, 'Une participation pour un beau moment tous ensemble.', 'Une participation pour un beau moment tous ensemble.', 5, true)
+    (
+      'Skyjo',
+      'Cultura',
+      15,
+      'Le but du jeu est simple : marquer le moins de points possible. Chaque joueur reçoit 12 cartes, et l''objectif est de former des séries de cartes de même valeur tout en éliminant les cartes indésirables. Le joueur avec le moins de points à la fin de la partie remporte la victoire.',
+      'Le but du jeu est simple : marquer le moins de points possible. Chaque joueur reçoit 12 cartes, et l''objectif est de former des séries de cartes de même valeur tout en éliminant les cartes indésirables. Le joueur avec le moins de points à la fin de la partie remporte la victoire.',
+      3,
+      true
+    ),
+    (
+      'Colo de handball',
+      null,
+      550,
+      'Colo de handball à Dunkerque avec au programme : des entrainements de handball, du beach handball, du bowling, de la patinoire, une journée à Plopsaqua parc aquatique et de nombreuses veillées.',
+      'Colo de handball à Dunkerque avec au programme : des entrainements de handball, du beach handball, du bowling, de la patinoire, une journée à Plopsaqua parc aquatique et de nombreuses veillées.',
+      4,
+      true
+    ),
+    (
+      'Lego fleurs',
+      'Lego',
+      50,
+      'Lego fleurs de lune pour créer de magnifiques fleurs en lego.',
+      'Lego fleurs de lune pour créer de magnifiques fleurs en lego.',
+      5,
+      true
+    ),
+    (
+      'K-way léger',
+      'K-way',
+      100,
+      'Claude est la veste courte emblématique pour les enfants qui aiment le style K-Way. Le point fort de la veste est le volume réduit qu''elle occupe une fois pliée et rangée dans une de ses deux poches. Idéale pour être facilement transportée dans un sac à dos à l''école ou lors d''une sortie d''une journée, elle est conçue pour résister à la pluie ou au vent soudains. Couleur : rose pâle. Taille : 14 ans. Caractéristiques : imperméable et coupe-vent.',
+      'Claude est la veste courte emblématique pour les enfants qui aiment le style K-Way. Le point fort de la veste est le volume réduit qu''elle occupe une fois pliée et rangée dans une de ses deux poches. Idéale pour être facilement transportée dans un sac à dos à l''école ou lors d''une sortie d''une journée, elle est conçue pour résister à la pluie ou au vent soudains. Couleur : rose pâle. Taille : 14 ans. Caractéristiques : imperméable et coupe-vent.',
+      6,
+      true
+    ),
+    (
+      'Gilet de protection airbag pour l''équitation',
+      'Kramer',
+      300,
+      'Gilet airbag d''équitation disposant d''un grand airbag sur la nuque qui protège le haut du corps et le cou en cas de chute de cheval. Marque : Kramer. Taille : XS.',
+      'Gilet airbag d''équitation disposant d''un grand airbag sur la nuque qui protège le haut du corps et le cou en cas de chute de cheval. Marque : Kramer. Taille : XS.',
+      7,
+      true
+    )
 )
-insert into public.gifts (title, price, description, note, sort_order, is_active)
+insert into public.gifts (title, seen_at, price, description, note, sort_order, is_active)
 select
   sg.title,
+  sg.seen_at,
   sg.price,
   sg.description,
   sg.note,
@@ -282,6 +333,22 @@ where not exists (
   from public.gifts g
   where g.title = sg.title
 );
+
+with seeded_gifts (title, seen_at) as (
+  values
+    ('Flip 7', 'Cultura'),
+    ('Sac en cuir Paul Marius', 'Edisac'),
+    ('Skyjo', 'Cultura'),
+    ('Colo de handball', null),
+    ('Lego fleurs', 'Lego'),
+    ('K-way léger', 'K-way'),
+    ('Gilet de protection airbag pour l''équitation', 'Kramer')
+)
+update public.gifts g
+set seen_at = sg.seen_at
+from seeded_gifts sg
+where g.title = sg.title
+  and (g.seen_at is null or g.seen_at = '');
 
 insert into public.gift_photos (gift_id, photo_url, sort_order)
 select gifts.id, gifts.photo_url, 1
@@ -295,11 +362,13 @@ and not exists (
 
 with seeded_photos (gift_title, photo_url, sort_order) as (
   values
-    ('Flip7', 'https://picsum.photos/seed/flip7/1200/900', 1),
+    ('Flip 7', 'https://picsum.photos/seed/flip7/1200/900', 1),
     ('Sac en cuir Paul Marius', 'https://picsum.photos/seed/paulmarius/1200/900', 1),
-    ('Participation vélo', 'https://picsum.photos/seed/velo/1200/900', 1),
-    ('Atelier créatif', 'https://picsum.photos/seed/atelier/1200/900', 1),
-    ('Week-end en famille', 'https://picsum.photos/seed/famille/1200/900', 1)
+    ('Skyjo', 'https://picsum.photos/seed/skyjo/1200/900', 1),
+    ('Colo de handball', 'https://picsum.photos/seed/colo-handball/1200/900', 1),
+    ('Lego fleurs', 'https://picsum.photos/seed/lego-fleurs/1200/900', 1),
+    ('K-way léger', 'https://picsum.photos/seed/kway-leger/1200/900', 1),
+    ('Gilet de protection airbag pour l''équitation', 'https://picsum.photos/seed/gilet-airbag-equitation/1200/900', 1)
 )
 insert into public.gift_photos (gift_id, photo_url, sort_order)
 select

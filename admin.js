@@ -191,6 +191,7 @@ function startEditGift(giftId) {
   editingGiftId = gift.id;
   giftForm.elements.gift_id.value = gift.id;
   giftForm.elements.title.value = gift.title || "";
+  giftForm.elements.seen_at.value = gift.seen_at || "";
   giftForm.elements.description.value = gift.description || gift.note || "";
   giftForm.elements.price.value = Number(gift.price).toFixed(2);
   renderExistingPhotos(gift);
@@ -249,6 +250,7 @@ function renderAdminGifts(gifts) {
         ? `<img src="${escapeHtml(coverPhotoUrl)}" alt="${escapeHtml(gift.title)}" />`
         : "";
       const description = gift.description || gift.note || "";
+      const seenAt = gift.seen_at ? `<p class="small-note">Vu chez ${escapeHtml(gift.seen_at)}</p>` : "";
       const state = gift.is_active ? "Actif" : "Masqué";
       const photoCount = getSortedPhotos(gift).length || (gift.photo_url ? 1 : 0);
 
@@ -256,6 +258,7 @@ function renderAdminGifts(gifts) {
         <article class="gift admin-gift-item">
           ${photoBlock}
           <h4>${escapeHtml(gift.title)}</h4>
+          ${seenAt}
           <p class="price">${formatAmount(gift.price)}</p>
           <p>${escapeHtml(description)}</p>
           <p class="small-note">Statut: ${state} | Photos: ${photoCount}</p>
@@ -298,7 +301,7 @@ async function loadAdminGifts() {
   const withPhotos = await supabaseClient
     .from("gifts")
     .select(
-      "id, title, price, description, note, photo_url, is_active, gift_photos(id, photo_url, sort_order)"
+      "id, title, seen_at, price, description, note, photo_url, is_active, gift_photos(id, photo_url, sort_order)"
     )
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
@@ -308,7 +311,7 @@ async function loadAdminGifts() {
   } else {
     const basic = await supabaseClient
       .from("gifts")
-      .select("id, title, price, description, note, photo_url, is_active")
+      .select("id, title, seen_at, price, description, note, photo_url, is_active")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
     data = basic.data;
@@ -575,6 +578,7 @@ giftForm.addEventListener("submit", async (event) => {
   const giftId = String(formData.get("gift_id") || "");
   const isEdit = Boolean(giftId);
   const title = String(formData.get("title") || "").trim();
+  const seenAt = String(formData.get("seen_at") || "").trim();
   const description = String(formData.get("description") || "").trim();
   const price = Number(formData.get("price"));
   const files = giftForm.elements.photos.files;
@@ -597,6 +601,7 @@ giftForm.addEventListener("submit", async (event) => {
   try {
     const payload = {
       title,
+      seen_at: seenAt || null,
       description,
       note: description,
       price,

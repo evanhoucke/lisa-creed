@@ -390,6 +390,21 @@ button.danger {
   background: rgba(93, 48, 56, 0.4);
 }
 
+.thanks-modal {
+  max-width: 460px;
+}
+
+.thanks-content {
+  text-align: center;
+  gap: 0.6rem;
+}
+
+.thanks-image {
+  width: min(220px, 70%);
+  margin: 0 auto 0.2rem;
+  display: block;
+}
+
 .modal-form {
   display: grid;
   gap: 0.8rem;

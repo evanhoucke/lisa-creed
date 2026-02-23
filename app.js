@@ -11,6 +11,8 @@ const form = document.getElementById("participation-form");
 const selectedGiftText = document.getElementById("selected-gift");
 const cancelBtn = document.getElementById("cancel-btn");
 const amountInput = form.elements.amount;
+const thanksModal = document.getElementById("thanks-modal");
+const thanksCloseBtn = document.getElementById("thanks-close-btn");
 
 let selectedGift = null;
 let gifts = [];
@@ -68,6 +70,7 @@ function getRemainingAmount(gift) {
 
 function renderGift(gift) {
   const safeDescription = gift.description || gift.note || "";
+  const seenAt = gift.seen_at ? `<p class="small-note">Vu chez ${escapeHtml(gift.seen_at)}</p>` : "";
   const budget = toAmount(gift.price);
   const remaining = getRemainingAmount(gift);
   const isComplete = remaining <= 0;
@@ -98,6 +101,7 @@ function renderGift(gift) {
     <article class="gift">
       ${photoBlock}
       <h3>${escapeHtml(gift.title)}</h3>
+      ${seenAt}
       <p class="price">Budget indicatif: ${gift.price} €</p>
       ${
         isComplete
@@ -177,7 +181,7 @@ async function loadGifts() {
   const withPhotos = await supabaseClient
     .from("gifts")
     .select(
-      "id, title, price, amount_collected, description, note, photo_url, gift_photos(photo_url, sort_order)"
+      "id, title, seen_at, price, amount_collected, description, note, photo_url, gift_photos(photo_url, sort_order)"
     )
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
@@ -188,7 +192,7 @@ async function loadGifts() {
   } else {
     const basic = await supabaseClient
       .from("gifts")
-      .select("id, title, price, amount_collected, description, note, photo_url")
+      .select("id, title, seen_at, price, amount_collected, description, note, photo_url")
       .eq("is_active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
@@ -257,6 +261,10 @@ cancelBtn.addEventListener("click", () => {
   modal.close();
 });
 
+thanksCloseBtn.addEventListener("click", () => {
+  thanksModal.close();
+});
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -303,7 +311,7 @@ form.addEventListener("submit", async (event) => {
       amount,
       message,
     });
-    alert("Merci! Ta participation a bien été enregistrée.");
+    thanksModal.showModal();
   } catch (mailError) {
     alert(
       "Participation enregistrée, mais la notification email n'a pas pu être envoyée."
