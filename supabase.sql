@@ -246,6 +246,43 @@ set amount_collected = coalesce((
   where participations.gift_id = gifts.id
 ), 0);
 
+with seeded_gifts (title, price, description, note, sort_order, is_active) as (
+  values
+    (
+      'Flip7',
+      15,
+      'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.',
+      'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.',
+      1,
+      true
+    ),
+    (
+      'Sac en cuir Paul Marius',
+      135,
+      'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transforme en sac business, porte-document idéal pour formats A4 et ordinateur 15 pouces, avec deux poches à boutons pression.',
+      'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transforme en sac business, porte-document idéal pour formats A4 et ordinateur 15 pouces, avec deux poches à boutons pression.',
+      2,
+      true
+    ),
+    ('Participation vélo', 350, 'Un vélo pour mes trajets et balades.', 'Un vélo pour mes trajets et balades.', 3, true),
+    ('Atelier créatif', 90, 'Une expérience artistique à partager.', 'Une expérience artistique à partager.', 4, true),
+    ('Week-end en famille', 420, 'Une participation pour un beau moment tous ensemble.', 'Une participation pour un beau moment tous ensemble.', 5, true)
+)
+insert into public.gifts (title, price, description, note, sort_order, is_active)
+select
+  sg.title,
+  sg.price,
+  sg.description,
+  sg.note,
+  sg.sort_order,
+  sg.is_active
+from seeded_gifts sg
+where not exists (
+  select 1
+  from public.gifts g
+  where g.title = sg.title
+);
+
 insert into public.gift_photos (gift_id, photo_url, sort_order)
 select gifts.id, gifts.photo_url, 1
 from public.gifts
@@ -256,11 +293,36 @@ and not exists (
   where gift_photos.gift_id = gifts.id
 );
 
-insert into public.gifts (title, price, description, note, sort_order)
-values
-  ('Flip7', 15, 'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.', 'Flip 7 est un jeu de cartes pour au moins 3 joueurs. Dans ce jeu d''ambiance de type stop ou encore, vous allez tenter de retourner des cartes une à une en espérant ne pas retourner deux fois le même numéro.', 1),
-  ('Sac en cuir Paul Marius', 135, 'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses.', 'Le sac en cuir Paul Marius propose un style élégant et décontracté. Il se transformera aisément en sac business, porte document idéal pour formats A4 et ordinateur 15 pouces, doté de deux poches à boutons pression. Il se porte à l''épaule avec sa bandoulière ou à la main avec ses deux anses.', 2),
-  ('Participation vélo', 350, 'Un vélo pour mes trajets et balades.', 'Un vélo pour mes trajets et balades.', 3),
-  ('Atelier créatif', 90, 'Une expérience artistique à partager.', 'Une expérience artistique à partager.', 4),
-  ('Week-end en famille', 420, 'Une participation pour un beau moment tous ensemble.', 'Une participation pour un beau moment tous ensemble.', 5)
-on conflict do nothing;
+with seeded_photos (gift_title, photo_url, sort_order) as (
+  values
+    ('Flip7', 'https://picsum.photos/seed/flip7/1200/900', 1),
+    ('Sac en cuir Paul Marius', 'https://picsum.photos/seed/paulmarius/1200/900', 1),
+    ('Participation vélo', 'https://picsum.photos/seed/velo/1200/900', 1),
+    ('Atelier créatif', 'https://picsum.photos/seed/atelier/1200/900', 1),
+    ('Week-end en famille', 'https://picsum.photos/seed/famille/1200/900', 1)
+)
+insert into public.gift_photos (gift_id, photo_url, sort_order)
+select
+  g.id,
+  sp.photo_url,
+  sp.sort_order
+from seeded_photos sp
+join public.gifts g on g.title = sp.gift_title
+where not exists (
+  select 1
+  from public.gift_photos gp
+  where gp.gift_id = g.id
+    and gp.photo_url = sp.photo_url
+);
+
+update public.gifts g
+set photo_url = first_photo.photo_url
+from (
+  select distinct on (gift_id)
+    gift_id,
+    photo_url
+  from public.gift_photos
+  order by gift_id, sort_order asc, created_at asc
+) as first_photo
+where g.id = first_photo.gift_id
+  and (g.photo_url is null or g.photo_url = '');
