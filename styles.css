@@ -315,6 +315,7 @@ footer p:first-child::after {
   line-height: 1;
   font-size: 1.1rem;
   background: rgba(210, 109, 99, 0.82);
+  z-index: 5;
 }
 
 .carousel-btn.prev {
