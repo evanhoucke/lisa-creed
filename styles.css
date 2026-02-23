@@ -239,6 +239,7 @@ h1 {
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #ffd27e, #ef7a62);
   opacity: 0.7;
+  z-index: 3;
 }
 
 .gift::after {
@@ -296,6 +297,8 @@ footer p:first-child::after {
   border-radius: 12px;
   scroll-snap-align: start;
   margin-bottom: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .carousel-btn {
