@@ -225,6 +225,8 @@ h1 {
   border: 1px solid var(--line);
   box-shadow: 0 10px 22px rgba(210, 109, 99, 0.14);
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .gift::before {
@@ -330,6 +332,15 @@ footer p:first-child::after {
   margin: 0 0 0.65rem;
   color: var(--taupe);
   font-weight: 600;
+}
+
+.gift p:not(.price):not(.small-note) {
+  text-align: justify;
+}
+
+.gift button[data-gift-id] {
+  margin-top: auto;
+  align-self: center;
 }
 
 button {
