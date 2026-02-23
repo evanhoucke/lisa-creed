@@ -348,6 +348,10 @@ button:hover {
   transform: translateY(-1px);
 }
 
+.carousel-btn:hover {
+  transform: translateY(-50%);
+}
+
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
