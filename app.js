@@ -11,6 +11,7 @@ const form = document.getElementById("participation-form");
 const selectedGiftText = document.getElementById("selected-gift");
 const cancelBtn = document.getElementById("cancel-btn");
 const amountInput = form.elements.amount;
+const heroSection = document.querySelector(".hero");
 const thanksModal = document.getElementById("thanks-modal");
 const thanksCloseBtn = document.getElementById("thanks-close-btn");
 const imageModal = document.getElementById("image-modal");
@@ -20,6 +21,7 @@ const imageModalCloseBtn = document.getElementById("image-modal-close-btn");
 let selectedGift = null;
 let gifts = [];
 let supabaseClient = null;
+let heroClickTimestamps = [];
 const PUBLIC_SUPABASE_OPTIONS = {
   auth: {
     // La page publique n'utilise pas de session utilisateur.
@@ -143,6 +145,23 @@ function isSupabaseConfigured() {
     SUPABASE_URL !== "https://YOUR_PROJECT_ID.supabase.co" &&
     SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
   );
+}
+
+function initHiddenAdminAccess() {
+  if (!heroSection) {
+    return;
+  }
+
+  heroSection.addEventListener("click", () => {
+    const now = Date.now();
+    heroClickTimestamps = heroClickTimestamps.filter((ts) => now - ts <= 900);
+    heroClickTimestamps.push(now);
+
+    if (heroClickTimestamps.length >= 3) {
+      heroClickTimestamps = [];
+      window.location.href = "admin.html";
+    }
+  });
 }
 
 function hasNotificationEmail() {
@@ -367,6 +386,7 @@ async function init() {
     SUPABASE_ANON_KEY,
     PUBLIC_SUPABASE_OPTIONS
   );
+  initHiddenAdminAccess();
 
   try {
     await loadGifts();
