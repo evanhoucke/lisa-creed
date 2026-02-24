@@ -111,6 +111,21 @@ body::after {
   transform: scaleX(-1);
 }
 
+.home-page .hero-inner::before,
+.home-page .hero-inner::after {
+  background-image: url("lisa.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 999px;
+}
+
+.home-page .hero-inner::after {
+  background-image: url("https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Birds-PNG/White_Dove_Transparent_PNG_Clipart.png?m=1629829990");
+  background-size: contain;
+  background-position: center;
+  border-radius: 0;
+}
+
 .hero-inner h1::after {
   content: "  ❤  ✿";
   color: rgba(210, 109, 99, 0.75);
